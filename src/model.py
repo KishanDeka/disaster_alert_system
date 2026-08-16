@@ -1,5 +1,4 @@
-import torch
-import torch.nn as nn
+from utils import *
 
 class ScratchCNN(nn.Module):
     def __init__(self, num_classes=4):
@@ -63,8 +62,9 @@ class ScratchCNN(nn.Module):
         acc = running_corrects / total_samples
         return loss, acc
 
-    def fit(self, train_loader, val_loader, criterion, optimizer, epochs=10, device='cuda', save_path="best_model.pth"):
+    def fit(self, train_loader, val_loader, criterion, optimizer, epochs=10, save_path="best_model.pth"):
         """Trains the model and saves the best weights based on validation loss."""
+        device = get_device()
         self.to(device)
         best_val_loss = float('inf')
 
@@ -103,3 +103,39 @@ class ScratchCNN(nn.Module):
                   f"Val Loss: {val_loss:.4f} Acc: {val_acc:.4f}")
 
         print(f"\nTraining complete! Best model saved to {save_path}")
+        
+
+    def predict(self, image_path):
+        # Image Preprocessing (must match validation transforms)
+        transform = T.Compose([
+            T.Resize((128, 128)),
+            T.ToTensor(),
+            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+        
+        # Load and transform image
+        raw_image = Image.open(image_path).convert('RGB')
+        input_tensor = transform(raw_image).unsqueeze(0).to(device)
+        
+        # Run inference
+        self.eval()
+        with torch.no_grad():
+            logits = self(input_tensor)
+            probabilities = F.softmax(logits, dim=1)[0].cpu().numpy()
+            pred_idx = probabilities.argmax()
+
+        pred_class = class_names[pred_idx]
+        confidence = float(probabilities[pred_idx] * 100)
+        prob_dict = {class_names[i]: float(prob) for i, prob in enumerate(probabilities)}
+        
+        '''
+        print("\n================ INFERENCE RESULT ================")
+        print(f"Image:            {image_path}")
+        print(f"Prediction:       {predicted_label}")
+        print(f"Confidence:       {confidence_score:.2f}%\n")
+        
+        print("Class Probabilities:")
+        for class_name, prob in zip(CLASS_NAMES, probabilities):
+            print(f"  - {class_name:<12}: {prob.item() * 100:.2f}%")
+        '''
+        return pred_class, confidence, prob_dict
