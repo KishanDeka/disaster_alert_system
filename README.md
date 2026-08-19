@@ -12,7 +12,7 @@ The project combines a custom **PyTorch CNN**, automated dataset handling, inter
 
 ---
 
-## 📌 Project Overview
+## Project Overview
 
 Rapid disaster assessment requires fast and accurate computer vision models. This project provides an end-to-end pipeline for training and deploying a satellite-image classification model.
 
@@ -49,20 +49,20 @@ Rapid disaster assessment requires fast and accurate computer vision models. Thi
 
 ---
 
-## 🎯 Target Categories
+## Target Categories
 
 The model classifies satellite image crops into four categories:
 
 | Class | Description |
 |---|---|
-| 🌋 **Earthquake** | Satellite imagery associated with earthquake-related damage or areas |
-| 🔥 **Fire** | Imagery showing wildfire or fire-affected regions |
-| 🌊 **Flood** | Imagery showing flooded or water-affected regions |
-| 🌲 **Normal** | Normal satellite imagery without the target disaster event |
+| **Earthquake** | Satellite imagery associated with earthquake-related damage or areas |
+| **Fire** | Imagery showing wildfire or fire-affected regions |
+| **Flood** | Imagery showing flooded or water-affected regions |
+| **Normal** | Normal satellite imagery without the target disaster event |
 
 ---
 
-## 🏗️ Project Architecture
+## Project Architecture
 
 ```text
                     ┌──────────────────────┐
@@ -109,7 +109,7 @@ The model classifies satellite image crops into four categories:
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 ```text
 .
@@ -133,13 +133,13 @@ The model classifies satellite image crops into four categories:
 
 ---
 
-# 🚀 Getting Started Locally
+# Getting Started Locally
 
 ## 1. Prerequisites
 
 Make sure the following are installed:
 
-- Python 3.10+
+- >= Python 3.10
 - pip
 - Git
 - Docker — optional, for containerized deployment
@@ -164,13 +164,6 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-### Windows
-
-```bash
-python -m venv venv
-venv\Scripts\activate
-```
-
 ---
 
 ## 4. Install Dependencies
@@ -181,7 +174,7 @@ pip install -r requirements.txt
 
 ---
 
-# 🧠 Model Training
+# Model Training
 
 The project uses a custom PyTorch CNN called `ScratchCNN`.
 
@@ -229,7 +222,7 @@ python main.py \
 
 ---
 
-# 🧪 Testing
+# Testing
 
 The project uses **pytest** for automated testing.
 
@@ -247,7 +240,7 @@ pytest -v
 
 ---
 
-# 🔍 Code Quality
+# Code Quality
 
 `flake8` is used to check Python code quality and style.
 
@@ -259,7 +252,7 @@ flake8 .
 
 ---
 
-# 🌐 Streamlit Dashboard
+# Streamlit Dashboard
 
 After training the model and generating the model weights, launch the interactive application:
 
@@ -273,36 +266,8 @@ The application will be available at:
 http://localhost:8501
 ```
 
-### Dashboard Workflow
 
-```text
-Upload Satellite Image
-          │
-          ▼
-    Image Preprocessing
-          │
-          ▼
-       ScratchCNN
-          │
-          ▼
-   Class Probabilities
-          │
-          ▼
-   Predicted Disaster
-```
-
-The dashboard supports:
-
-- Single-image upload.
-- Image preprocessing.
-- Real-time inference.
-- Predicted class display.
-- Probability visualization.
-- Four-class classification.
-
----
-
-# 🐳 Docker Deployment
+# Docker Deployment
 
 The application can be packaged into a Docker container for reproducible deployment.
 
@@ -324,35 +289,7 @@ The Streamlit application will then be available at:
 http://localhost:8501
 ```
 
----
-
-## Docker Architecture
-
-```text
-┌──────────────────────────────────────────┐
-│              Docker Container            │
-│                                          │
-│  ┌────────────────────────────────────┐  │
-│  │          Streamlit App             │  │
-│  │              app.py                │  │
-│  └─────────────────┬──────────────────┘  │
-│                    │                     │
-│                    ▼                     │
-│  ┌────────────────────────────────────┐  │
-│  │         ScratchCNN Model            │  │
-│  │          best_model.pth             │  │
-│  └────────────────────────────────────┘  │
-│                                          │
-└─────────────────────┬────────────────────┘
-                      │
-                      │ Port 8501
-                      ▼
-                 Web Browser
-```
-
----
-
-# ⚙️ CI/CD Pipeline
+# CI/CD Pipeline
 
 The project includes a GitHub Actions workflow located at:
 
@@ -393,58 +330,7 @@ The workflow performs:
 
 ---
 
-# 🛠️ Tech Stack
-
-| Technology | Purpose |
-|---|---|
-| **Python 3.10+** | Core programming language |
-| **PyTorch** | Deep learning framework |
-| **Torchvision** | Computer vision utilities |
-| **Pandas** | Data processing |
-| **NumPy** | Numerical operations |
-| **PIL** | Image processing |
-| **KaggleHub** | Dataset downloading |
-| **Streamlit** | Interactive inference dashboard |
-| **Docker** | Containerization |
-| **GitHub Actions** | CI/CD automation |
-| **PyTest** | Automated testing |
-| **Flake8** | Code quality and linting |
-
----
-
-# 📊 Machine Learning Pipeline
-
-The complete machine-learning workflow is:
-
-```text
-Dataset Acquisition
-       ↓
-Data Indexing
-       ↓
-Train / Validation Data
-       ↓
-Image Preprocessing
-       ↓
-Channel Statistics
-       ↓
-ScratchCNN
-       ↓
-Model Training
-       ↓
-Model Evaluation
-       ↓
-Best Model Weights
-       ↓
-Streamlit Inference
-       ↓
-Docker Deployment
-```
-
-This structure separates the data, model, application, and deployment layers, making the project easier to maintain and extend.
-
----
-
-# 🔬 Model Architecture
+# CNN Model Architecture
 
 `ScratchCNN` is a custom convolutional neural network designed specifically for the four-class satellite-image classification problem.
 
@@ -489,64 +375,7 @@ Fully Connected Layer
 
 ---
 
-# 📁 Core Source Modules
-
-## `src/dataset.py`
-
-Responsible for:
-
-- Dataset downloading.
-- Dataset indexing.
-- Image loading.
-- Dataset preprocessing.
-- Channel-wise mean/std calculation.
-- PyTorch dataset functionality through `CSVDataset`.
-
-## `src/model.py`
-
-Contains the `ScratchCNN` implementation, including:
-
-- CNN architecture.
-- Training functionality.
-- Prediction functionality.
-- Model-related utilities.
-
-## `src/utils.py`
-
-Contains shared utilities such as:
-
-- Device selection.
-- Random seed configuration.
-- Project constants.
-- Common helper functions.
-
-## `main.py`
-
-Acts as the model-training entry point.
-
-It handles:
-
-- Dataset preparation.
-- Model initialization.
-- Training configuration.
-- Training execution.
-- Model weight saving.
-
-## `app.py`
-
-Provides the Streamlit inference interface.
-
-It handles:
-
-- Image upload.
-- Image preprocessing.
-- Model loading.
-- Prediction.
-- Probability visualization.
-
----
-
-# ☁️ Deployment
+# Deployment
 
 The Dockerized application can be deployed to cloud platforms that support Docker containers.
 
@@ -566,26 +395,7 @@ Before deployment, ensure that:
 
 ---
 
-# 🔐 Dataset & Credentials
-
-If the dataset requires Kaggle authentication, configure your Kaggle credentials according to the `kagglehub` requirements.
-
-Do **not** commit credentials, API tokens, passwords, or private keys to the repository.
-
-Recommended files to exclude from version control include:
-
-```text
-.env
-*.key
-*.pem
-kaggle.json
-```
-
-Add sensitive files to `.gitignore` where appropriate.
-
----
-
-# 🧪 Development Workflow
+# Development Workflow
 
 A typical development workflow is:
 
@@ -614,7 +424,7 @@ streamlit run app.py
 
 ---
 
-# 📌 Future Improvements
+# Future Improvements
 
 Potential extensions include:
 
@@ -644,11 +454,11 @@ See the `LICENSE` file for more information.
 
 **YOUR_NAME**
 
-GitHub: `https://github.com/YOUR_USERNAME`
+GitHub: `https://github.com/KishanDeka`
 
 ---
 
-## ⭐ Project Summary
+## Project Summary
 
 This project demonstrates a complete computer-vision and MLOps workflow:
 
