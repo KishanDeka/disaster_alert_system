@@ -1,16 +1,19 @@
 import os
 import numpy as np 
 import pandas as pd
-import matplotlib.pyplot as pl
+import matplotlib.pyplot as plt
 import matplotlib as mpl
+import seaborn as sns
 import random
 import shutil
+import json
 from PIL import Image
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as T
 import torch.nn as nn
 import torch.nn.functional as F
+from sklearn.metrics import classification_report, confusion_matrix
 
 # Global Constants
 CLASS_NAMES = ['Fire', 'Flood', 'Normal', 'Earthquake']

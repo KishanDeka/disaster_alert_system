@@ -63,7 +63,7 @@ class ScratchCNN(nn.Module):
         acc = running_corrects / total_samples
         return loss, acc
 
-    def fit(self, train_loader, val_loader, criterion, optimizer, epochs=10, save_path="best_model.pth"):
+    def fit(self, train_loader, val_loader, criterion, optimizer, epochs=10, save_path="../data/best_model.pth"):
         """Trains the model and saves the best weights based on validation loss."""
         device = get_device()
         self.to(device)
@@ -140,3 +140,70 @@ class ScratchCNN(nn.Module):
             print(f"  - {class_name:<12}: {prob.item() * 100:.2f}%")
         '''
         return pred_class, confidence, prob_dict
+        
+        
+    def run_and_save_evaluation(self, test_loader, output_dir="../data/summary/"):
+        """Evaluates model and stores matplotlib figure, text report, and metrics dict."""
+        os.makedirs(output_dir, exist_ok=True)
+    
+        fig_path = os.path.join(output_dir, "confusion_matrix.png")
+        csv_path = os.path.join(output_dir, "evaluation_metrics.csv")
+        json_path = os.path.join(output_dir, "summary_metrics.json")
+        
+        device = get_device()
+        self.to(device)
+        self.eval()
+        
+        all_preds = []
+        all_labels = []
+        with torch.no_grad():
+            for inputs, labels in test_loader:
+                images = inputs.to(device)
+                outputs = self(images)
+                _, preds = torch.max(outputs, 1)
+                
+                all_preds.extend(preds.cpu().numpy())
+                all_labels.extend(labels.numpy())
+
+        # 1. Compute classification metrics dictionary
+        report_dict = classification_report(all_labels, all_preds, target_names=CLASS_NAMES, output_dict=True)
+
+        # 2. Extract per-class rows into a DataFrame
+        per_class_data = []
+        for c_name in CLASS_NAMES:
+            per_class_data.append({
+                "Class Name": c_name,
+                "Precision": f"{report_dict[c_name]['precision'] * 100:.2f}%",
+                "Recall": f"{report_dict[c_name]['recall'] * 100:.2f}%",
+                "F1-Score": f"{report_dict[c_name]['f1-score'] * 100:.2f}%",
+                "Support (Total Samples)": int(report_dict[c_name]['support'])
+            })
+        
+        metrics_df = pd.DataFrame(per_class_data)
+        metrics_df.to_csv(csv_path, index=False)
+    
+        # 3. Compute Confusion Matrix
+        cm = confusion_matrix(all_labels, all_preds)
+        fig, ax = plt.subplots(figsize=(6, 5))
+        sns.heatmap(
+            cm, 
+            annot=True, 
+            fmt='d', 
+            cmap='Blues', 
+            xticklabels=CLASS_NAMES, 
+            yticklabels=CLASS_NAMES,
+            ax=ax
+        )
+        plt.xlabel('Predicted Label')
+        plt.ylabel('True Label')
+        plt.title('Test Set Confusion Matrix')
+        plt.tight_layout()
+        plt.savefig(fig_path)
+        plt.close()
+
+        summary_metrics = {
+            "accuracy": report_dict["accuracy"] * 100,
+            "macro_f1": report_dict["macro avg"]["f1-score"] * 100
+        }
+        with open(json_path, "w") as f:
+            json.dump(summary_metrics, f, indent=4)

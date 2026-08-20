@@ -53,18 +53,20 @@ def run_pipeline(data_dir, epochs, batch_size, lr, weights_path):
     # Initialize Datasets & DataLoaders
     train_dataset = CSVDataset(csv_file=csv_file, split='train', transform=train_transform)
     val_dataset = CSVDataset(csv_file=csv_file, split='val', transform=val_transform)
+    test_dataset = CSVDataset(csv_file=csv_file, split='test', transform=val_transform)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
 
     print(f"Loaded {len(train_dataset)} training samples, {len(val_dataset)} validation samples.")
-
+    
     # Instantiate Model, Loss Function, and Optimizer
     print("\n--- Model Initialization ---")
     model = ScratchCNN(num_classes=len(CLASS_NAMES))
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-
+    
     # Train Model
     print("\n--- Training ---")
     model.fit(
@@ -75,6 +77,14 @@ def run_pipeline(data_dir, epochs, batch_size, lr, weights_path):
         epochs=epochs,
         save_path=weights_path
     )
+
+    # Run evaluation and save to files
+    print("\n--- Evaluation ---")
+    model.load_state_dict(torch.load(weights_path, map_location=device))
+    model.run_and_save_evaluation(
+            test_loader=test_loader,
+            output_dir="data/summary/"
+        )
     
 
 if __name__ == "__main__":
@@ -83,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=20, help="Number of training epochs")
     parser.add_argument("--batch_size", type=int, default=32, help="Batch size for DataLoaders")
     parser.add_argument("--lr", type=float, default=0.001, help="Learning rate")
-    parser.add_argument("--weights_path", type=str, default="data/best_model.pth", help="Output path for best model weights")
+    parser.add_argument("--weights_path", type=str, default="data/model/best_model.pth", help="Output path for best model weights")
 
     args = parser.parse_args()
 
@@ -94,3 +104,5 @@ if __name__ == "__main__":
         lr=args.lr,
         weights_path=args.weights_path
     )
+    
+    
