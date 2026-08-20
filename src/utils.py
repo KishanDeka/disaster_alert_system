@@ -1,3 +1,4 @@
+import os
 import numpy as np 
 import pandas as pd
 import matplotlib.pyplot as pl
@@ -9,6 +10,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 import torchvision.transforms as T
 import torch.nn as nn
+import torch.nn.functional as F
 
 # Global Constants
 CLASS_NAMES = ['Fire', 'Flood', 'Normal', 'Earthquake']
@@ -25,3 +27,13 @@ def set_seed(seed=123):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+        
+def load_dataset_stats(csv_path="data/dataset_stats.csv"):
+    """Reads mean and std from CSV and returns them as lists."""
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Stats CSV file not found at: {csv_path}")
+    
+    df = pd.read_csv(csv_path)
+    mean = df['mean'].tolist()
+    std = df['std'].tolist()
+    return mean, std

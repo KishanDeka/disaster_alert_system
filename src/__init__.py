@@ -1,3 +1,3 @@
-from src.dataprocess import CSVDataset
-from src.model import ScratchCNN
 from src.utils import *
+from src.dataset import CSVDataset
+from src.model import ScratchCNN

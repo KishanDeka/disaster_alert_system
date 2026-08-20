@@ -1,4 +1,4 @@
-from utils import *
+from src.utils import *
 
 class ScratchCNN(nn.Module):
     def __init__(self, num_classes=4):
@@ -42,12 +42,13 @@ class ScratchCNN(nn.Module):
         x = self.classifier(x)
         return x
 
-    def evaluate(self, data_loader, criterion, device):
+    def evaluate(self, data_loader, criterion):
         """Runs validation/testing on a given DataLoader."""
         self.eval()
         running_loss, running_corrects = 0.0, 0
         total_samples = len(data_loader.dataset)
-
+        
+        device = get_device()
         with torch.no_grad():
             for inputs, labels in data_loader:
                 inputs, labels = inputs.to(device), labels.to(device)
@@ -91,7 +92,7 @@ class ScratchCNN(nn.Module):
             train_acc = running_corrects / train_total
 
             # Validation Phase
-            val_loss, val_acc = self.evaluate(val_loader, criterion, device)
+            val_loss, val_acc = self.evaluate(val_loader, criterion)
 
             # Checkpoint Save
             if val_loss < best_val_loss:
@@ -105,17 +106,17 @@ class ScratchCNN(nn.Module):
         print(f"\nTraining complete! Best model saved to {save_path}")
         
 
-    def predict(self, image_path):
+    def predict(self, image_input, mean, std):
         # Image Preprocessing (must match validation transforms)
         transform = T.Compose([
             T.Resize((128, 128)),
             T.ToTensor(),
-            T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            T.Normalize(mean=mean, std=std)
         ])
         
-        # Load and transform image
-        raw_image = Image.open(image_path).convert('RGB')
-        input_tensor = transform(raw_image).unsqueeze(0).to(device)
+        device = get_device()
+        # transform image
+        input_tensor = transform(image_input).unsqueeze(0).to(device)
         
         # Run inference
         self.eval()
@@ -124,9 +125,9 @@ class ScratchCNN(nn.Module):
             probabilities = F.softmax(logits, dim=1)[0].cpu().numpy()
             pred_idx = probabilities.argmax()
 
-        pred_class = class_names[pred_idx]
+        pred_class = CLASS_NAMES[pred_idx]
         confidence = float(probabilities[pred_idx] * 100)
-        prob_dict = {class_names[i]: float(prob) for i, prob in enumerate(probabilities)}
+        prob_dict = {CLASS_NAMES[i]: float(prob) for i, prob in enumerate(probabilities)}
         
         '''
         print("\n================ INFERENCE RESULT ================")

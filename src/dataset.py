@@ -1,12 +1,19 @@
 import os
 import kagglehub
-from utils import *
+from src.utils import *
 
 class CSVDataset(Dataset):
     def __init__(self, csv_file, split='train', transform=None):
         self.csv_file = csv_file
         self.split = split
         self.transform = transform
+        # class labels
+        self.labels = {
+                    0: "Fire",
+                    1: "Flood",
+                    2: "Normal",
+                    3: "Earthquake",
+                }
         
         # Load CSV and filter by split
         df = pd.read_csv(csv_file)
@@ -25,40 +32,30 @@ class CSVDataset(Dataset):
             image = self.transform(image)
             
         return image, label
-
-    @staticmethod
-    def prepare_dataset(target_dir="../data", dataset_handle="kishandeka27/aiderv2-dataset", 
-                           csv_name="data_list.csv" ):
+    
+    def prepare_dataset(self, target_dir="../data", dataset_handle="kishandeka27/aiderv2-dataset"):
         """Downloads dataset via kagglehub and generates the index CSV."""
         os.makedirs(target_dir, exist_ok=True)
-        csv_path = os.path.join(target_dir, csv_name)
-
+        
         # Download dataset via kagglehub
         os.environ["KAGGLEHUB_CACHE"] = os.path.abspath(target_dir)
-        downloaded_path = kagglehub.dataset_download(dataset_handle)
-
-        # split directories and class labels
-        splits = {
-            "train": os.path.join(downloaded_path, "Train", "Train"),
-            "val": os.path.join(downloaded_path, "Val", "Val"),
-            "test": os.path.join(downloaded_path, "Test", "Test")
-        }
-
-        labels = {
-            0: "Fire",
-            1: "Flood",
-            2: "Normal",
-            3: "Earthquake",
-        }
-
+        download_path = os.path.join(os.environ["KAGGLEHUB_CACHE"], 'datasets', dataset_handle, 'versions/1')
+        if os.path.exists(download_path) is False :
+            _ = kagglehub.dataset_download(dataset_handle)
+        print(download_path)
+        
+        # split directories 
+        self.splits = {
+                "train": os.path.join(download_path, "Train", "Train"),
+                "val": os.path.join(download_path, "Val", "Val"),
+                "test": os.path.join(download_path, "Test", "Test")
+                }
+                
         # Index image filepaths into data frame
         data = []
-        for split, split_path in splits.items():
-            for label, label_name in labels.items():
+        for split, split_path in self.splits.items():
+            for label, label_name in self.labels.items():
                 folder_path = os.path.join(split_path, label_name)
-                
-                if not os.path.exists(folder_path):
-                    continue
 
                 for img_name in os.listdir(folder_path):
                     img_path = os.path.join(folder_path, img_name)
@@ -72,10 +69,9 @@ class CSVDataset(Dataset):
                         })
 
         df = pd.DataFrame(data)
-        df.to_csv(csv_path, index=False)
-        print(f"Dataset indexed successfully ({len(df)} samples) -> {csv_path}")
-        return csv_path, splits, labels
-
+        df.to_csv(self.csv_file, index=False)
+        print(f"Dataset indexed successfully ({len(df)} samples) -> {self.csv_file}")
+        
     @classmethod
     def calculate_mean_and_std(cls, csv_file, split='train', img_size=(128, 128), batch_size=64):
         """Calculates channel-wise dataset statistics dynamically."""
