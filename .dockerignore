@@ -1,8 +1,0 @@
-__pycache__/
-*.pyc
-.pytest_cache/
-.git/
-.github/
-.env
-venv/
-data/datasets/

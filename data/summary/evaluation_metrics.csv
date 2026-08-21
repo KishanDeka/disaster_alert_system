@@ -1,5 +1,0 @@
-Class Name,Precision,Recall,F1-Score,Support (Total Samples)
-Fire,98.55%,93.58%,96.00%,436
-Flood,94.24%,91.24%,92.71%,502
-Normal,89.03%,90.15%,89.58%,477
-Earthquake,81.92%,92.89%,87.06%,239
