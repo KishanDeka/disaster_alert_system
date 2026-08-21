@@ -40,7 +40,7 @@ def test_model_evaluation(dummy_model, tmp_path):
     loader = DataLoader(TensorDataset(dummy_x, dummy_y), batch_size=5)
 
     # Execute evaluation pipeline to output directory
-    output_dir = str(tmp_path / "summary")
+    output_dir = str(tmp_path / "summary/")
     dummy_model.run_and_save_evaluation(
             test_loader=loader,
             output_dir=output_dir
