@@ -63,10 +63,10 @@ def render_custom_probability_bar(class_name, prob_percent, color="#4A90E2"):
     
     
 # --- Main App Execution ---
-st.title(" Satellite Imagery Disaster Detection")
+st.title(" OrbitalGaurd : Satellite Imagery Disaster Detection")
 st.markdown(
     "Upload a satellite image to classify natural disaster events "
-    "*(Earthquake, Fire, Flood, Normal)* or run a batch prediction on test set samples."
+    "**(Earthquake, Fire, Flood, Normal)** or run a batch prediction on test set samples."
 )
 
 # --- Load Model & Config ---
@@ -94,7 +94,7 @@ with tab_inference:
     # Button to trigger batch predictions
     st.sidebar.markdown("---")
     st.sidebar.subheader(" Batch Test Preview")
-    run_random_batch = st.sidebar.button("🎲 Predict 4 Random Test Images")
+    run_random_batch = st.sidebar.button("🎲 Predict Random Test Images")
 
 
     # --- Option A: Predict 4 Random Test Images ---
@@ -182,7 +182,7 @@ with tab_inference:
 
     # --- Default State ---
     else:
-        st.info("Upload an image or click **'Predict 4 Random Test Images'** in the sidebar to test predictions.")
+        st.info("Upload an image or click **'Predict Random Test Images'** in the sidebar to test predictions.")
         
 
 # ==========================================
