@@ -11,7 +11,21 @@ st.set_page_config(
     page_icon="🛰️",
     layout="wide"
 )
+  
+@st.cache_resource
+def load_model_and_config(weights_path = '../data/model/best_model.pth', stats_path = "../data/data_stats.csv"):
+    device = get_device()
+    model = ScratchCNN(num_classes=len(CLASS_NAMES))
     
+    if os.path.exists(weights_path):
+        model.load_state_dict(torch.load(weights_path, map_location=device))
+        model.to(device)
+        model.eval()
+
+    mean, std = None, None
+    if os.path.exists(stats_path):
+        mean, std = load_dataset_stats(stats_path)
+    return model, device, mean, std  
 
 # --- Helper to sample random test images ---
 def get_random_test_images(data_dir="data/", num_samples=4):
@@ -56,7 +70,7 @@ st.markdown(
 )
 
 # --- Load Model & Config ---
-@st.cache_resource
+
 model, device, mean, std = load_model_and_config(weights_path = 'data/model/best_model.pth', stats_path = "data/data_stats.csv")
 fig_path, metrics_df, summary = load_saved_evaluation_assets(output_dir="data/summary/")
 
