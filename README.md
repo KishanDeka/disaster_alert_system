@@ -4,7 +4,7 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-ff4b4b.svg)](https://streamlit.io/)
 [![Docker](https://img.shields.io/badge/Docker-Enabled-2496ed.svg)](https://www.docker.com/)
-[![CI/CD ML Pipeline](https://github.com/KishanDeka/disaster_alert_system/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/KishanDeka/disaster_alert_system/actions/workflows/ci-cd.yml)
+[![CI/CD ML Pipeline](https://github.com/KishanDeka/DisasterLens/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/KishanDeka/DisasterLens/actions/workflows/ci-cd.yml)
 
 An end-to-end **Deep Learning system and MLOps pipeline** designed to classify satellite imagery into natural disaster events in real time.
 
