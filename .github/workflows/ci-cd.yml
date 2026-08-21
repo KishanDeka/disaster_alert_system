@@ -1,5 +1,6 @@
-name: CI/CD ML Pipeline
+name: CI/CD Pipeline
 
+# Controls when the workflow will run
 on:
   push:
     branches: [ "main", "ci-cd", "develop" ]
@@ -7,11 +8,12 @@ on:
     branches: [ "main", "ci-cd" ]
 
 jobs:
-  test-and-lint:
+  # Job 1: Run Pytest & Code Quality Checks
+  test:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout Code
       uses: actions/checkout@v4
 
     - name: Set up Python
@@ -23,16 +25,34 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest pytest-cov flake8
+        pip install "pytest>=7.4.0" "pytest-cov>=4.1.0" flake8
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Lint Code Quality (Flake8)
+    - name: Check Code Syntax (Flake8)
       run: |
-        # Stop the build if there are Python syntax errors or undefined names
+        # Stop build if there are syntax errors or undefined names
         flake8 src/ tests/ --count --select=E9,F63,F7,F82 --show-source --statistics
-        # Exit-zero treats all errors as warnings.
-        flake8 src/ tests/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Run Pytest Test Suite
+    - name: Run Pytest Suite
       run: |
         pytest --cov=src --cov-report=term-missing
+
+  # Job 2: Build Docker Image
+  docker-build:
+    needs: test  # Only run if tests pass
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker Image
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        file: ./Dockerfile
+        push: false # Set to true if pushing to Docker Hub or GitHub Packages
+        tags: disaster-classifier:latest
