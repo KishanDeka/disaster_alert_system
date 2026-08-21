@@ -40,3 +40,20 @@ def load_dataset_stats(csv_path="data/dataset_stats.csv"):
     mean = df['mean'].tolist()
     std = df['std'].tolist()
     return mean, std
+        
+    
+def load_saved_evaluation_assets(output_dir="../data/summary/"):
+    """Reads saved evaluation files directly from disk."""
+    fig_path = os.path.join(output_dir, "confusion_matrix.png")
+    csv_path = os.path.join(output_dir, "evaluation_metrics.csv")
+    json_path = os.path.join(output_dir, "summary_metrics.json")
+
+    # Check if all saved files exist
+    if not (os.path.exists(fig_path) and os.path.exists(csv_path) and os.path.exists(json_path)):
+        return None, None, None
+
+    metrics_df = pd.read_csv(csv_path)
+    with open(json_path, "r") as f:
+        summary_metrics = json.load(f)
+
+    return fig_path, metrics_df, summary_metrics    

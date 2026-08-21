@@ -8,6 +8,6 @@ pillow
 scikit-learn
 seaborn
 matplotlib
-pytest
-flake8
+pytest>=7.4.0
+pytest-cov>=4.1.0
 streamlit

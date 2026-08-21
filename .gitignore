@@ -1,1 +1,7 @@
 data/datasets
+venv/
+.venv/
+env/
+*.pyc
+*/*.pyc
+*/*/*.pyc
