@@ -7,7 +7,7 @@ from src.model import ScratchCNN
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="Satellite Disaster Classifier",
+    page_title="OrbitalGaurd : Satellite Imagery & Natural Disaster Classifier",
     page_icon="🛰️",
     layout="wide"
 )
