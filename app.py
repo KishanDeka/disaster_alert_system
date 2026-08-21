@@ -11,47 +11,7 @@ st.set_page_config(
     page_icon="🛰️",
     layout="wide"
 )
-
-
-# --- Load Model & Config (Cached) ---
-@st.cache_resource
-def load_model_and_config():
-    device = get_device()
-    weights_path = "data/model/best_model.pth"
-    stats_path = "data/data_stats.csv"
-
-    model = ScratchCNN(num_classes=len(CLASS_NAMES))
     
-    if os.path.exists(weights_path):
-        model.load_state_dict(torch.load(weights_path, map_location=device))
-        model.to(device)
-        model.eval()
-    else:
-        st.error(f"Model weights file `{weights_path}` not found! Please train the model first.")
-
-    mean, std = None, None
-    if os.path.exists(stats_path):
-        mean, std = load_dataset_stats(stats_path)
-
-    return model, device, mean, std
- 
-    
-def load_saved_evaluation_assets(output_dir="data/summary/"):
-    """Reads saved evaluation files directly from disk."""
-    fig_path = os.path.join(output_dir, "confusion_matrix.png")
-    csv_path = os.path.join(output_dir, "evaluation_metrics.csv")
-    json_path = os.path.join(output_dir, "summary_metrics.json")
-
-    # Check if all saved files exist
-    if not (os.path.exists(fig_path) and os.path.exists(csv_path) and os.path.exists(json_path)):
-        return None, None, None
-
-    metrics_df = pd.read_csv(csv_path)
-    with open(json_path, "r") as f:
-        summary_metrics = json.load(f)
-
-    return fig_path, metrics_df, summary_metrics    
-
 
 # --- Helper to sample random test images ---
 def get_random_test_images(data_dir="data/", num_samples=4):
@@ -95,8 +55,10 @@ st.markdown(
     "*(Earthquake, Fire, Flood, Normal)* or run a batch prediction on test set samples."
 )
 
-model, device, mean, std = load_model_and_config()
-fig_path, metrics_df, summary = load_saved_evaluation_assets()
+# --- Load Model & Config ---
+@st.cache_resource
+model, device, mean, std = load_model_and_config(weights_path = 'data/model/best_model.pth', stats_path = "data/data_stats.csv")
+fig_path, metrics_df, summary = load_saved_evaluation_assets(output_dir="data/summary/")
 
 tab_inference, tab_analytics = st.tabs([" Real-Time Inference", " Model Performance & Metrics"])
 

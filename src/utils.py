@@ -40,3 +40,36 @@ def load_dataset_stats(csv_path="data/dataset_stats.csv"):
     mean = df['mean'].tolist()
     std = df['std'].tolist()
     return mean, std
+    
+def load_model_and_config(weights_path = '../data/model/best_model.pth', stats_path = "../data/data_stats.csv"):
+    device = get_device()
+    model = ScratchCNN(num_classes=len(CLASS_NAMES))
+    
+    if os.path.exists(weights_path):
+        model.load_state_dict(torch.load(weights_path, map_location=device))
+        model.to(device)
+        model.eval()
+    else:
+        st.error(f"Model weights file `{weights_path}` not found! Please train the model first.")
+
+    mean, std = None, None
+    if os.path.exists(stats_path):
+        mean, std = load_dataset_stats(stats_path)
+    return model, device, mean, std
+        
+    
+def load_saved_evaluation_assets(output_dir="../data/summary/"):
+    """Reads saved evaluation files directly from disk."""
+    fig_path = os.path.join(output_dir, "confusion_matrix.png")
+    csv_path = os.path.join(output_dir, "evaluation_metrics.csv")
+    json_path = os.path.join(output_dir, "summary_metrics.json")
+
+    # Check if all saved files exist
+    if not (os.path.exists(fig_path) and os.path.exists(csv_path) and os.path.exists(json_path)):
+        return None, None, None
+
+    metrics_df = pd.read_csv(csv_path)
+    with open(json_path, "r") as f:
+        summary_metrics = json.load(f)
+
+    return fig_path, metrics_df, summary_metrics    
