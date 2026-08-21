@@ -5,7 +5,7 @@ from src.utils import load_dataset_stats
 
 def test_load_dataset_stats(tmp_path):
     """Test loading mean and std from a temporary CSV file."""
-    csv_file = tmp_path + "/dataset_stats.csv"
+    csv_file = tmp_path / "dataset_stats.csv"
     df = pd.DataFrame({
         "channel": [0, 1, 2],
         "mean": [0.485, 0.456, 0.406],
